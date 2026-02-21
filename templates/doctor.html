@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCOS – Doctor Recommendation</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f78fb3 0%, #ff6f91 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6f91 0%, #ff9a9e 100%);
+            color: #fff;
+            padding: 26px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-title {
+            font-size: 1.7em;
+            font-weight: 600;
+        }
+
+        .header-sub {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .back-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 26px 30px 30px 30px;
+        }
+
+        .alert-box {
+            background: linear-gradient(135deg, #ff6f91 0%, #ffc3a0 100%);
+            color: #7a1c2e;
+            padding: 18px 20px;
+            border-radius: 14px;
+            margin-bottom: 22px;
+        }
+
+        .alert-box h2 {
+            font-size: 1.3em;
+            margin-bottom: 6px;
+        }
+
+        .snapshot {
+            background: #fff5f8;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 22px;
+        }
+
+        .snapshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .snapshot-item {
+            background: #fff;
+            border: 1px solid #ffd6e0;
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+
+        .snapshot-label {
+            font-size: 0.8em;
+            color: #777;
+        }
+
+        .snapshot-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            margin-top: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .card {
+            background: #fff5f8;
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid #ffd6e0;
+        }
+
+        .card h3 {
+            font-size: 1.05em;
+            margin-bottom: 10px;
+            color: #d63384;
+        }
+
+        .card ul {
+            margin-left: 18px;
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            font-size: 0.85em;
+            color: #555;
+            background: #fff0f5;
+            border-left: 4px solid #ff6f91;
+            padding: 10px 12px;
+            border-radius: 6px;
+        }
+
+        .maps-button {
+            background: linear-gradient(135deg, #ff6f91 0%, #ff3e6c 100%);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .maps-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 62, 108, 0.4);
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .content { padding: 22px 18px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div>
+            <div class="header-title">🩺 Doctor Recommendation</div>
+            <div class="header-sub">
+                Your risk level indicates professional medical evaluation is strongly recommended
+            </div>
+        </div>
+        <a href="{{ url_for('risk') }}" class="back-link">← Back to risk prediction</a>
+    </div>
+
+    <div class="content">
+
+        <div class="alert-box">
+            <h2>🚨 HIGH RISK Detected</h2>
+            <p>
+                Your PCOS probability is 
+                <strong>{{ (probability * 100)|round(0) }}%</strong>.
+                Please consult a specialist as soon as possible.
+            </p>
+        </div>
+
+        {% if form_data %}
+        <div class="snapshot">
+            <h3>📋 Your Health Snapshot</h3>
+            <div class="snapshot-grid">
+
+                <div class="snapshot-item">
+                    <div class="snapshot-label">Age</div>
+                    <div class="snapshot-value">{{ form_data.get('age', 'N/A') }} years</div>
+                </div>
+
+                <div class="snapshot-item">
+                    <div class="snapshot-label">BMI</div>
+                    {% set h = form_data.get('height', '0')|float %}
+                    {% set w = form_data.get('weight', '0')|float %}
+                    <div class="snapshot-value">
+                        {% if h > 0 %}{{ (w / ((h/100)**2))|round(1) }}{% else %}N/A{% endif %}
+                    </div>
+                </div>
+
+                <div class="snapshot-item">
+                    <div class="snapshot-label">AMH</div>
+                    <div class="snapshot-value">{{ form_data.get('amh', 'N/A') }}</div>
+                </div>
+
+                <div class="snapshot-item">
+                    <div class="snapshot-label">TSH</div>
+                    <div class="snapshot-value">{{ form_data.get('tsh', 'N/A') }}</div>
+                </div>
+
+                <div class="snapshot-item">
+                    <div class="snapshot-label">FSH</div>
+                    <div class="snapshot-value">{{ form_data.get('fsh', 'N/A') }}</div>
+                </div>
+
+                <div class="snapshot-item">
+                    <div class="snapshot-label">LH</div>
+                    <div class="snapshot-value">{{ form_data.get('lh', 'N/A') }}</div>
+                </div>
+
+                <div class="snapshot-item">
+                    <div class="snapshot-label">PCOS Probability</div>
+                    <div class="snapshot-value" style="color:#d63384;">
+                        {{ (probability * 100)|round(0) }}%
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+
+        <h2 style="margin-bottom:14px;">Recommended Specialists</h2>
+
+        <div class="grid">
+            <div class="card">
+                <h3>👩‍⚕️ Gynaecologist</h3>
+                <ul>
+                    <li>Primary specialist for PCOS diagnosis</li>
+                    <li>Ultrasound & hormonal evaluation</li>
+                    <li>Menstrual regulation & fertility support</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>🔬 Endocrinologist</h3>
+                <ul>
+                    <li>Hormonal imbalance assessment</li>
+                    <li>Insulin & metabolic evaluation</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>🥗 Clinical Dietitian</h3>
+                <ul>
+                    <li>PCOS-specific meal planning</li>
+                    <li>Weight & insulin management</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>🧠 Mental Health Professional</h3>
+                <ul>
+                    <li>Stress & anxiety management</li>
+                    <li>Emotional support for chronic care</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 style="margin-bottom:14px;">📍 Find Nearby Gynaecologists</h2>
+
+        <div class="card" style="text-align:center;">
+            <p style="margin-bottom:12px; font-size:0.9em;">
+                Click below to search nearby gynaecologists using Google Maps.
+            </p>
+
+            <button class="maps-button" onclick="openMaps()">
+                🔍 View Nearby Doctors
+            </button>
+        </div>
+
+        <div class="footer-note">
+            <strong>Important:</strong>
+            This system provides informational guidance only and does not replace professional medical diagnosis.
+        </div>
+
+    </div>
+</div>
+
+<script>
+function openMaps() {
+    window.open(
+        "https://www.google.com/maps/search/gynaecologist+near+me",
+        "_blank"
+    );
+}
+</script>
+
+</body>
+</html> 

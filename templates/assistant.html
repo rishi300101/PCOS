@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Lifestyle Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6fb;
+            margin: 0;
+        }
+
+        /* Header */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .hero-links {
+            position: absolute;
+            top: 18px;
+            right: 25px;
+            font-size: 0.9em;
+        }
+
+        .hero-links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 12px;
+        }
+
+        .info-box {
+            max-width: 800px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        /* Floating Chat Widget */
+        #chat-widget {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            max-height: 420px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e1e4ff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        #chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color:#fff;
+            padding:10px 14px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        #chat-box {
+            padding:10px 12px;
+            height:240px;
+            overflow-y:auto;
+            font-size:0.9em;
+        }
+
+        #chat-form {
+            padding:8px 10px;
+        }
+
+        #chat-input {
+            width:100%;
+            padding:8px;
+            border-radius:8px;
+            border:1px solid #ccc;
+            margin-bottom:6px;
+        }
+
+        .send-btn {
+            background:#667eea;
+            color:white;
+            border:none;
+            padding:8px 15px;
+            border-radius:6px;
+            cursor:pointer;
+        }
+
+        /* Toggle Button */
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color:#fff;
+            font-weight:600;
+            cursor:pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+            z-index:1000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <h1>AI Lifestyle Assistant</h1>
+        <div class="hero-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <p>
+            Use the assistant (bottom right corner) to ask questions about:
+        </p>
+        <ul>
+            <li>PCOS diet recommendations</li>
+            <li>Exercise plans</li>
+            <li>Sleep and stress management</li>
+            <li>Healthy lifestyle habits</li>
+        </ul>
+        <p><strong>Note:</strong> This assistant does NOT provide diagnosis or medication advice.</p>
+    </div>
+
+    <!-- Floating Chat Widget -->
+    <div id="chat-widget">
+        <div id="chat-header">
+            <span>AI Assistant</span>
+            <button id="chat-close" style="background:none;border:none;color:white;cursor:pointer;">×</button>
+        </div>
+
+        <div id="chat-box">
+            <div><strong>Assistant:</strong> Hi! Ask me about PCOS lifestyle guidance.</div>
+        </div>
+
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Type your question..." autocomplete="off">
+            <button type="submit" class="send-btn">Send</button>
+        </form>
+    </div>
+
+    <!-- Toggle Button -->
+    <button id="chat-toggle">Chat</button>
+
+    <script>
+        const widget = document.getElementById('chat-widget');
+        const toggleBtn = document.getElementById('chat-toggle');
+        const closeBtn = document.getElementById('chat-close');
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('chat-input');
+        const box = document.getElementById('chat-box');
+
+        toggleBtn.onclick = () => {
+            widget.style.display = widget.style.display === 'block' ? 'none' : 'block';
+        };
+
+        closeBtn.onclick = () => {
+            widget.style.display = 'none';
+        };
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const text = input.value.trim();
+            if(!text) return;
+
+            box.innerHTML += "<div><strong>You:</strong> " + text + "</div>";
+            input.value = "";
+
+            const res = await fetch("{{ url_for('chat') }}", {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({message:text})
+            });
+
+            const data = await res.json();
+            box.innerHTML += "<div><strong>Assistant:</strong> " + (data.reply || "Error") + "</div>";
+            box.scrollTop = box.scrollHeight;
+        });
+    </script>
+
+</body>
+</html>

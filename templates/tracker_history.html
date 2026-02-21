@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tracker History</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f78fb3 0%, #ff6f91 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #d63384;
+        }
+
+        .chart-container {
+            margin-bottom: 40px;
+        }
+
+        canvas {
+            background: #fff5f8;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .entries {
+            margin-top: 20px;
+        }
+
+        .entry-card {
+            background: #fff5f8;
+            border: 1px solid #ffd6e0;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: 0.3s ease;
+        }
+
+        .entry-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 111, 145, 0.3);
+        }
+
+        .entry-date {
+            font-weight: bold;
+            color: #d63384;
+            margin-bottom: 5px;
+        }
+
+        .entry-details {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            text-decoration: none;
+            color: #d63384;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #777;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>📊 Weight Trend</h2>
+
+    <div class="chart-container">
+        <canvas id="weightChart"></canvas>
+    </div>
+
+    <script>
+    const ctx = document.getElementById('weightChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ dates | safe }},
+            datasets: [{
+                label: 'Weight (kg)',
+                data: {{ weights | safe }},
+                borderColor: '#ff3e6c',
+                backgroundColor: 'rgba(255, 62, 108, 0.2)',
+                tension: 0.3,
+                fill: true,
+                pointBackgroundColor: '#d63384',
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#d63384',
+                        font: { weight: 'bold' }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#555' }
+                },
+                y: {
+                    ticks: { color: '#555' }
+                }
+            }
+        }
+    });
+    </script>
+
+    <h2>📝 All Entries</h2>
+
+    <div class="entries">
+
+        {% if entries %}
+            {% for entry in entries %}
+            <div class="entry-card">
+                <div class="entry-date">{{ entry.date }}</div>
+                <div class="entry-details">
+                    Mood: {{ entry.mood }} |
+                    Acne: {{ entry.acne }} |
+                    Hair Loss: {{ entry.hair_loss }} |
+                    Weight: {{ entry.weight }} kg
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-message">
+                No tracker entries available yet.
+            </div>
+        {% endif %}
+
+    </div>
+
+    <a href="/tracker" class="back-link">⬅ Back to Tracker</a>
+
+</div>
+
+</body>
+</html>

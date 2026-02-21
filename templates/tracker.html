@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Period & Symptom Tracker</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f78fb3 0%, #ff6f91 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Top Right Dashboard Link */
+        .top-nav {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+        }
+
+        .dashboard-link {
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: 0.3s ease;
+        }
+
+        .dashboard-link:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 20px;
+            width: 600px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #d63384;
+        }
+
+        /* Horizontal Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 25px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ffd6e0;
+            outline: none;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #ff6f91;
+            box-shadow: 0 0 6px rgba(255, 111, 145, 0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #ff6f91 0%, #ff3e6c 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 62, 108, 0.4);
+        }
+
+        .success-message {
+            text-align: center;
+            color: #28a745;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        .history-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            text-decoration: none;
+            color: #d63384;
+            font-weight: 600;
+        }
+
+        .history-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive for mobile */
+        @media (max-width: 650px) {
+            .container {
+                width: 90%;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- Top Right Navigation -->
+<div class="top-nav">
+    <a href="/dashboard" class="dashboard-link">🏠 Dashboard</a>
+</div>
+
+<div class="container">
+
+    <h2>🗓 Period & Symptom Tracker</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="date">
+        </div>
+
+        <div class="form-group">
+            <label>Cycle Day</label>
+            <input type="number" id="cycle_day" placeholder="Enter cycle day">
+        </div>
+
+        <div class="form-group">
+            <label>Mood</label>
+            <select id="mood">
+                <option value="">Select Mood</option>
+                <option>Happy</option>
+                <option>Sad</option>
+                <option>Irritated</option>
+                <option>Anxious</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight" placeholder="Enter weight">
+        </div>
+
+        <div class="form-group">
+            <label>Acne</label>
+            <select id="acne">
+                <option>No</option>
+                <option>Yes</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Hair Loss</label>
+            <select id="hair_loss">
+                <option>No</option>
+                <option>Yes</option>
+            </select>
+        </div>
+
+    </div>
+
+    <button onclick="saveTracker()">Save Tracker</button>
+
+    <div id="message" class="success-message"></div>
+
+    <a href="/tracker-history" class="history-link">📊 View History</a>
+
+</div>
+
+<script>
+function saveTracker() {
+
+    fetch("/save-tracker", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            date: document.getElementById("date").value,
+            cycle_day: document.getElementById("cycle_day").value,
+            mood: document.getElementById("mood").value,
+            acne: document.getElementById("acne").value,
+            hair_loss: document.getElementById("hair_loss").value,
+            weight: document.getElementById("weight").value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("message").innerText = "Tracker data saved successfully 💖";
+    })
+    .catch(err => {
+        document.getElementById("message").innerText = "Error saving data.";
+    });
+}
+</script>
+
+</body>
+</html>
